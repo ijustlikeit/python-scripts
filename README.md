@@ -17,7 +17,7 @@ Usage:
 
 --src is the source  root folder where you have your image objects are stored.<br>
 --dst is the destination folder where you will host the site.<br>
---size is the size of the thumbnail tuple (480 270)
---object is the object type that Coral AI has detected (eg person, car, book etc)
+--size is the size of the thumbnail tuple (480 270).<br>
+--object is the object type that Coral AI has detected (eg person, car, book etc).<br>
 
 Note: It is currently hard coded to only support jpg formats.
