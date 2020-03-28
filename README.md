@@ -1,24 +1,23 @@
 # python-scripts
  
-<h2> video_html_generator.py </h2>
+<h2> object_html_generator.py </h2>
 <p>
-This script generates an html file based on a directory of mp4 videos. It recursively scans the source directory and generates a thumbnail for each video, uploading them to the dst folder. It creates a simple list of all the videos.
-
-It can be useful to trigger the script when motion videos are uploaded to an FTP server (using watchman or some other file watcher). You can then add the website to other home automation displays, like Home Assistant. In HA, just add an iFrame card and set the url to http://<your_server_ip/index.html.
+in progress
 
 
-![](demo_animation.gif)
 </p>
 
 Install instructions:
-1. Install ffmpeg for your platform
+1. 
 2. Install python3 and pip3
-3. pip install ffmpy yattag
+3. pip install  yattag
 
 Usage:
-`python video-html-generator.py --src /var/ftp/uploads --dst /var/www/camsite/`
+`python object-html-generator.py --src /coralai/objects --dst /var/www/yoursite/ --size 480 270 --object person`
 
---src is the source folder where you have your videos stored.<br>
+--src is the source  root folder where you have your image objects are stored.<br>
 --dst is the destination folder where you will host the site.<br>
+--size is the size of the thumbnail tuple (480 270)
+--object is the object type that Coral AI has detected (eg person, car, book etc)
 
-Note: It is currently hard coded to only support mp4 formats.
+Note: It is currently hard coded to only support jpg formats.
