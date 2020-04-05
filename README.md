@@ -2,22 +2,19 @@
  
 <h2> object_html_generator.py </h2>
 <p>
-in progress
+Input is folder with subfolders named as objects (person, car, dog).  In these subfolders are jpeg images (that I my case have been identified by google coral AI and boxes drawn around them) of said object type (eg person).  So the end result is a object html file (eg person.html) that has thumbnails in a grid of 4 per row that can be clicked on to expand to the full image.
+This script generates html files from subdirectories of type object.  So for example if you specify "person" as the object parameter this script will scan the person subdirectory and create html to view the jpegs within that subdirectory and store the images,thumbnails, and person.html files in the parameter specified directory (--dst) where you are hosting your web server.
+Multiple objects can be specified by listing them separated by commas eg.  --object 'person,car,dog'.  
+If the directory where you are storing the html does not yet have a subdirectory for the object, eg 'person', one will be created for you.
+The contents of the --src directory will remain unchanged.
+Only works with .jpeg files
+Install into crontab with 'crontab -e' as follows:
+*/15 * * * * sudo python /yourlocation/object_html_generator.py --src /yourobjectimages  --dst /var/www/yourserver/ --size 0480 270 --object 'person,car,dog'
+where /15 means run every 15 minutes; /yourlocation/ is where you chose to save your python scripts;  /yourobjectimages/ root directory containing subfolders of object type; size is the size of the thumbnail to be generated; and of course /yourserver/ is location your web server is configured to serve web pages from.
+
 
 
 </p>
 
-Install instructions:
-1. 
-2. Install python3 and pip3
-3. pip install  yattag
 
-Usage:
-`python object-html-generator.py --src /coralai/objects --dst /var/www/yoursite/ --size 480 270 --object person`
 
---src is the source  root folder where you have your image objects are stored.<br>
---dst is the destination folder where you will host the site.<br>
---size is the size of the thumbnail tuple (480 270).<br>
---object is the object type that Coral AI has detected (eg person, car, book etc).<br>
-
-Note: It is currently hard coded to only support jpg formats.
