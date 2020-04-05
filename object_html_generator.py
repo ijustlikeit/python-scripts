@@ -1,10 +1,19 @@
-# version 1.0 March 27 2020
-# This scripts generates an html file based on a directory of jpg  object images . 
+# version 1.1 April 5, 2020
+# This script generates html files from subdirectories of type object.  So for example if you specify "person" as the object parameter this script will scan the person
+# subdirectory and create html to view the jpegs within that subdirectory and store the images,thumbnails, and person.html files in the parameter specified directory
+# (--dst) where you are hosting your web server.
+# Multiple objects can be specified by listing them separated by commas eg.  --object 'person,car,dog'  
+# If the directory where you are storing the html does not yet have a subdirectory for the object, eg 'person', one will be created for you
+# The contents of the --src directory will remain unchanged.
+# Only works with .jpeg files
+# Install into crontab with 'crontab -e' as follows:
+#*/15 * * * * sudo python /yourlocation/object_html_generator.py --src /yourobjectimages  --dst /var/www/yourserver/ --size 0480 270 --object 'person,car,dog'
+# where /15 means run every 15 minutes; /yourlocation/ is where you chose to save your python scripts;  /yourobjectimages/ root directory containing subfolders of 
+# object type; size is the size of the thumbnail to be generated; and of course /yourserver/ is location your web server is configured to serve web pages from.
 
-#Instructions:
+# Other Instructions:
 #
-# Install python3 and pip3
-# pip install PIL yattag python-crontab
+# Requires PIL and yattag so  pip install PIL yattag 
 
 import os
 import time
@@ -19,7 +28,7 @@ class ImageHtmlGenerator:
 
     OVERWRITE_THUMBNAIL = False     
 
-    def __init__(self, src_dir, dst_dir, resize, obj_input, cronjob_frequency):
+    def __init__(self, src_dir, dst_dir, resize, obj_input):
         self.image_files = []
 
         self.image_root_dir         = src_dir
@@ -27,13 +36,13 @@ class ImageHtmlGenerator:
         self.web_server_image_dir   = os.path.join(self.web_server_dir, obj_input)
 	self.resize_parm 	    = resize
         self.object_type            = obj_input
-        self.cronjob_frequency      = cronjob_frequency
+       
 
     def generate(self):
         self.search_for_images()
         self.copy_images()
         self.generate_html()
-        self.setup_crontab()
+        
 
     def search_for_images(self):
 
@@ -84,6 +93,7 @@ class ImageHtmlGenerator:
             print('Copied', copied, 'image files.')
 
     def generate_html(self):
+        doc, tag, text = Doc().tagtext()
         if len(self.image_files) == 0:
            htmlheadertext = 'No images with type ' + self.object_type + ' found!'
         elif len(self.image_files) == 1:
@@ -122,9 +132,10 @@ class ImageHtmlGenerator:
                  doc.asis('</div>')
 
         # Write the HTML to disk
+        
         html_text = indent(doc.getvalue(), indent_text = True)
         HTML_FILENAME = self.object_type + '.html'
-        print(HTML_FILENAME)
+        
         html_filepath = os.path.join(self.web_server_dir, HTML_FILENAME)
 
         print ('Generating html file at ' + html_filepath)
@@ -143,32 +154,7 @@ class ImageHtmlGenerator:
 	    resizeImagewithText(image_path, self.web_server_image_dir, self.resize_parm)  
 
 			
-    def setup_crontab(self):
 
-        if (self.cronjob_frequency is not None):
-            from crontab import CronTab
-
-            crontab_comment = 'Object HTML Generator script'
-            script_path = os.path.realpath(__file__)
-            command = 'python3 ' + script_path +  ' --src ' + self.image_root_dir + ' --dst ' + self.web_server_dir + ' --size ' + self.resize_parm
-            print(command)
-            my_cron = CronTab(user='don')
-            existing_cron_job = None
-            for job in my_cron:
-                if job.comment == crontab_comment:
-                    print ('Updating existing cronjob')
-                    existing_cron_job = job
-
-            print('Crontab job command is ' + command)
-            if existing_cron_job is None:
-                print ('Creating new cronjob')
-                existing_cron_job = my_cron.new(command=command, comment=crontab_comment)
-            else:
-                existing_cron_job.set_command(command)
-                
-            existing_cron_job.minute.every(self.cronjob_frequency)
-             
-            my_cron.write()
 
 def resizeImagewithText(infile, output_dir, size):
     outfile = os.path.splitext(os.path.basename(infile))[0]
@@ -195,21 +181,25 @@ def resizeImagewithText(infile, output_dir, size):
 
 def main():
 
-    parser = argparse.ArgumentParser(description='This script takes a source folder of jpg files and generates a webpage.')# You can optionally add --dst to specify a directory where you would like to copy the files to (a web server dir).')
+    parser = argparse.ArgumentParser(description='This script takes a source subfolder(s) of jpg files and generates a webpage.')
     parser.add_argument('-s','--src', help='Root directory where you have jpg files stored.',required=True)
     parser.add_argument('-d','--dst', help='Directory where you are hosting your web server, where the generated web page will be copied.', required=True)
     parser.add_argument('-r','--size', nargs=2, type=int,  help='Output size')
-    parser.add_argument('-o','--object', help='Object type that is to be displayed.', required=True)
-    parser.add_argument('-c', '--cronjobp', help='Add an entry to the crontab to start this script periodically.')
+    parser.add_argument('-o','--object', help='Object list that html will be generated for.', required=True)
     args = parser.parse_args()
 
-    src = args.src + '/' + args.object
+#    src = args.src + '/' + args.object
     dst = args.dst
     output_size = args.size if args.size else (480,270)
     obj_input = args.object
-    cronjob = args.cronjobp
-    htmlGenerator = ImageHtmlGenerator(src, dst, output_size, obj_input, cronjob)
-    htmlGenerator.generate()
+    obj_list = list(obj_input.split(","))
+    print('Generating html for the following objects: ', obj_list)
+    for ind_obj in obj_list:
+        src = args.src + '/' + ind_obj
+        print('Doing ', src, ' subfolder now')
+        htmlGenerator = ImageHtmlGenerator(src, dst, output_size, ind_obj)
+        htmlGenerator.generate()
+        print('Finished processing object ', ind_obj)
 
 if __name__ == "__main__":
     main()
