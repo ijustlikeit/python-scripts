@@ -11,7 +11,7 @@ The contents of the --src directory will remain unchanged.
 Only works with .jpeg files
   
   <p>
-Install into crontab with 'crontab -e' as follows:
+Install into crontab with 'crontab -e' as follows: <p>
 */15 * * * * sudo python /yourlocation/object_html_generator.py --src /yourobjectimages  --dst /var/www/yourserver/ --size 0480 270 --object 'person,car,dog'
 where /15 means run every 15 minutes; /yourlocation/ is where you chose to save your python scripts;  /yourobjectimages/ root directory containing subfolders of object type; size is the size of the thumbnail to be generated; and of course /yourserver/ is location your web server is configured to serve web pages from.
 
