@@ -1,4 +1,4 @@
-# version 1.1 April 5, 2020
+# version 1.2 April 13, 2020
 # This script generates html files from subdirectories of type object.  So for example if you specify "person" as the object parameter this script will scan the person
 # subdirectory and create html to view the jpegs within that subdirectory and store the images,thumbnails, and person.html files in the parameter specified directory
 # (--dst) where you are hosting your web server.
@@ -55,7 +55,7 @@ class ImageHtmlGenerator:
                     # print('Found jpg file at ' + file_path)
                     self.image_files.append(file_path)
 
-        self.image_files.sort(reverse=True)
+        self.image_files.sort(key=os.path.getctime,reverse=True)
 
         if len(self.image_files) == 0:
             print ('No image jpg files found!')
